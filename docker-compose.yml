@@ -1,0 +1,76 @@
+# Docker Compose — Multimodal Crop Disease Diagnosis (v2)
+#
+# Starts both containers together:
+#   - backend:  FastAPI app on http://localhost:8000
+#   - frontend: React app (built + served via Nginx) on http://localhost:3000
+#
+# Quick start:
+#   docker compose up --build
+#
+# Stop:
+#   docker compose down
+#
+# Reset all data (DB + uploaded images + trained model artifacts):
+#   docker compose down -v
+#
+# NOTES:
+# - The backend works immediately with NO trained models present (it
+#   runs in the documented fallback-heuristic / rule-based modes — see
+#   README.md "Honesty Notes"). To use real trained models, either
+#   train them first on the host and they will be picked up via the
+#   `backend_storage` volume mount, or exec into the running container
+#   and run the training scripts there (slower, no GPU by default).
+# - `backend_storage` is a named volume so trained models, the SQLite
+#   database, and uploaded images persist across `docker compose up`/
+#   `down` cycles (but NOT across `down -v`).
+# - The frontend's REACT_APP_API_BASE_URL is baked in at build time
+#   (see frontend/Dockerfile comments) — if you change the backend's
+#   published port/host, rebuild the frontend image.
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: crop-disease-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=production
+      - CORS_ORIGINS=http://localhost:3000
+      - DATABASE_URL=sqlite:///./storage/app.db
+      - IMAGE_MODEL_PATH=./storage/models/disease_model.keras
+      - FIELD_MODEL_PATH=./storage/models/field_model.joblib
+      - LABEL_MAP_PATH=./storage/models/label_map.json
+      - FEATURE_FUSION_MODEL_PATH=./storage/models/feature_fusion_model.keras
+      - FEATURE_FUSION_PREPROCESSOR_PATH=./storage/models/feature_fusion_model_field_preprocessor.joblib
+      - WEATHER_PROVIDER=open-meteo
+      - ENABLE_LIVE_WEATHER=true
+      - UPLOAD_DIR=./storage/uploads
+      - MAX_UPLOAD_MB=8
+    volumes:
+      - backend_storage:/app/storage
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_BASE_URL: http://localhost:8000
+    container_name: crop-disease-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  backend_storage:

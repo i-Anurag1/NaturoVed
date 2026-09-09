@@ -1,0 +1,9 @@
+crop_type,growth_stage,location,temperature_c,humidity_pct,rainfall_mm,soil_moisture_pct,expected_risk_note
+tomato,vegetative,"Coimbatore, TN",27,82,15,55,High risk - humid+moderate temp+rain
+tomato,flowering,"Nashik, MH",38,30,0,25,Low risk - hot and dry
+potato,vegetative,"Shimla, HP",20,78,12,60,High risk - classic late blight conditions
+potato,maturity,"Agra, UP",34,45,2,35,Medium risk
+corn,vegetative,"Ludhiana, PB",26,70,8,50,Medium risk
+corn,flowering,"Guntur, AP",31,85,20,70,High risk - rust/gray leaf spot favorable
+tomato,seedling,"Pune, MH",24,55,3,40,Medium risk
+potato,fruiting,"Ooty, TN",18,88,25,75,High risk - cool wet conditions favor late blight

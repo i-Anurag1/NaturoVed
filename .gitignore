@@ -1,0 +1,49 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+venv/
+.venv/
+*.env
+!.env.example
+
+# --- Backend runtime artifacts ---
+backend/storage/app.db
+backend/storage/uploads/*
+!backend/storage/uploads/.gitkeep
+backend/storage/models/*.h5
+backend/storage/models/*.keras
+backend/storage/models/label_map.json
+backend/storage/models/*_history.json
+backend/storage/models/*_synthtest*
+backend/storage/models/fusion_comparison_results.json
+backend/storage/models/feature_fusion_model.keras
+backend/storage/models/feature_fusion_model_field_preprocessor.joblib
+!backend/storage/models/.gitkeep
+# NOTE: field_model.joblib (+ its metrics.json) IS committed — it trains
+# in seconds on synthetic data, so shipping it lets the app run with a
+# real trained field-risk model immediately, with no setup required.
+# The image disease model (.keras) and the experimental feature-fusion
+# model are intentionally NOT committed: shipping a "trained" model that
+# actually has random (non-ImageNet) weights trained only on a tiny
+# synthetic benchmark would misrepresent it as a real result. Train
+# these yourself per the README once you have PlantVillage + network
+# access to download ImageNet weights.
+backend/*.egg-info/
+backend/eval_results/
+
+# --- Dataset (large, not committed) ---
+data/raw/
+data/processed/
+
+# --- Node / React ---
+frontend/node_modules/
+frontend/build/
+frontend/.env
+npm-debug.log*
+
+# --- OS / Editor ---
+.DS_Store
+.vscode/
+.idea/
+*.log

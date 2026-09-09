@@ -1,0 +1,28 @@
+# --- Core API ---
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+python-multipart==0.0.9
+pydantic==2.7.4
+pydantic-settings==2.3.4
+
+# --- Database ---
+SQLAlchemy==2.0.31
+
+# --- ML / CV ---
+tensorflow-cpu==2.16.1        # swap for tensorflow (GPU) if CUDA available
+numpy==1.26.4
+opencv-python-headless==4.10.0.84
+Pillow==10.4.0
+scikit-learn==1.5.1
+joblib==1.4.2
+pandas==2.2.2
+
+# --- Weather integration (v2) ---
+requests==2.32.3
+
+# --- PDF report generation (v2) ---
+reportlab==4.2.5
+
+# --- Testing ---
+pytest==8.2.2
+httpx==0.27.0
