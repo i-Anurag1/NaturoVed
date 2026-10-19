@@ -52,6 +52,18 @@ DISEASE_FAMILY_TIPS = {
         "Improve field drainage and airflow to reduce prolonged leaf wetness.",
         "Consider resistant hybrids for future seasons if this disease recurs.",
     ],
+        "Bacterial_Spot": [
+        "Remove and destroy heavily infected leaves; avoid handling plants when foliage is wet.",
+        "Use drip or base-level irrigation instead of overhead watering, since splashing water spreads bacteria.",
+        "Practice crop rotation and avoid planting the same crop family in the same spot in consecutive seasons.",
+        "Use disease-free seed or transplants in future plantings, and consult a local agricultural extension office about approved treatment options.",
+    ],
+    "Powdery_Mildew": [
+        "Improve air circulation through proper spacing and pruning to reduce humidity around foliage.",
+        "Remove and destroy heavily affected leaves; do not compost them.",
+        "Avoid excess nitrogen fertilization, which promotes soft, susceptible growth.",
+        "Consult a local agricultural extension office about approved control options and resistant varieties for your region.",
+    ],
 }
 
 SEVERITY_TIPS = {

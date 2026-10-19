@@ -21,6 +21,9 @@ CLASS_NAMES = [
     "Corn___Healthy",
     "Corn___Common_Rust",
     "Corn___Gray_Leaf_Spot",
+    "Pepper___Healthy",
+    "Pepper___Bacterial_Spot",
+    "Squash___Powdery_Mildew",
 ]
 
 # Which crop each class belongs to (used to filter/validate predictions
@@ -40,6 +43,9 @@ CLASS_INFO = {
     "Corn___Healthy": "No visible disease symptoms detected on the corn leaf.",
     "Corn___Common_Rust": "Small reddish-brown pustules typical of Puccinia sorghi.",
     "Corn___Gray_Leaf_Spot": "Rectangular gray-tan lesions typical of Cercospora zeae-maydis.",
+    "Pepper___Healthy": "No visible disease symptoms detected on the pepper leaf.",
+    "Pepper___Bacterial_Spot": "Small dark, water-soaked spots that may turn brown with yellow halos, typical of Xanthomonas infection.",
+    "Squash___Powdery_Mildew": "White powdery fungal growth on the leaf surface.",
 }
 
 NUM_CLASSES = len(CLASS_NAMES)
