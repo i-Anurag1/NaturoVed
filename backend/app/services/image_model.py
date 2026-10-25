@@ -234,26 +234,46 @@ def predict_disease(image_path: str, crop_type: str) -> dict:
 
     if _model_mode == "trained":
         x = _preprocess_image(image_path)
-        probs = _model.predict(x, verbose=0)[0]
+        probs = np.asarray(_model.predict(x, verbose=0)[0])
 
-        # Restrict to classes belonging to the user-declared crop_type so
-        # the field-context input actively participates in the pipeline
-        # (true multimodal behavior, not "image model ignores context").
-        valid_indices = [i for i, name in _label_map.items() if CLASS_TO_CROP[name] == crop_type]
-        if valid_indices:
-            masked_probs = np.zeros_like(probs)
-            for i in valid_indices:
-                masked_probs[i] = probs[i]
-            if masked_probs.sum() > 0:
-                masked_probs = masked_probs / masked_probs.sum()
-                probs = masked_probs
+        # Validate runtime probabilities before indexing class labels.
+        # Incompatible demo artifacts safely fall back to heuristic mode.
+        usable = (
+            isinstance(_label_map, dict)
+            and probs.ndim == 1
+            and probs.size == len(_label_map)
+            and all(isinstance(i, int) and 0 <= i < probs.size for i in _label_map)
+            and all(name in CLASS_TO_CROP for name in _label_map.values())
+        )
 
-        top_idx = int(np.argmax(probs))
-        return {
-            "predicted_disease": _label_map[top_idx],
-            "confidence": float(round(probs[top_idx], 4)),
-            "model_mode": "trained",
-        }
+        if not usable:
+            print(
+                f"[image_model] Runtime model/label mismatch: "
+                f"probabilities={probs.size}, labels={len(_label_map or {})}. "
+                "Switching to demo heuristic mode."
+            )
+            _model = None
+            _label_map = None
+            _model_mode = "fallback_heuristic"
+        else:
+            valid_indices = [
+                i for i, name in _label_map.items()
+                if CLASS_TO_CROP[name] == crop_type
+            ]
+            if valid_indices:
+                masked_probs = np.zeros_like(probs)
+                for i in valid_indices:
+                    masked_probs[i] = probs[i]
+                if masked_probs.sum() > 0:
+                    masked_probs = masked_probs / masked_probs.sum()
+                    probs = masked_probs
+
+            top_idx = int(np.argmax(probs))
+            return {
+                "predicted_disease": _label_map[top_idx],
+                "confidence": float(round(probs[top_idx], 4)),
+                "model_mode": "trained",
+            }
 
     result = _fallback_heuristic_predict(image_path, crop_type)
     result["model_mode"] = "fallback_heuristic"
