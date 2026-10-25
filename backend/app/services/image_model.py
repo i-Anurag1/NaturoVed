@@ -231,6 +231,13 @@ def predict_disease(image_path: str, crop_type: str) -> dict:
     Returns: {predicted_disease, confidence, model_mode}
     """
     global _model, _label_map, _model_mode
+    # These newer crop classes may not match the deployed model artifact.
+    # Use the existing safe demo fallback rather than indexing incompatible outputs.
+    if crop_type in {"pepper", "squash", "broccoli", "cabbage", "cauliflower"}:
+        result = _fallback_heuristic_predict(image_path, crop_type)
+        result["model_mode"] = "fallback_heuristic"
+        return result
+
     _try_load_model()
 
     if _model_mode == "trained":
