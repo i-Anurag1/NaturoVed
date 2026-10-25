@@ -64,6 +64,43 @@ DISEASE_FAMILY_TIPS = {
         "Avoid excess nitrogen fertilization, which promotes soft, susceptible growth.",
         "Consult a local agricultural extension office about approved control options and resistant varieties for your region.",
     ],
+        "Alternaria_Leaf_Spot": [
+        "Remove and destroy heavily infected leaves, and clear crop debris after harvest.",
+        "Avoid overhead irrigation; keep foliage dry and improve airflow through spacing.",
+        "Rotate away from brassica crops for a season or more to reduce carry-over of the pathogen.",
+        "Consult a local agricultural extension office about approved control options for your region.",
+    ],
+    "Black_Rot": [
+        "Remove and destroy infected plants or leaves; do not compost them.",
+        "Avoid working in the field when foliage is wet, since the bacteria spread easily by water and tools.",
+        "Use disease-free seed and rotate away from brassica crops for several seasons.",
+        "Consult a local agricultural extension office for region-appropriate management advice.",
+    ],
+    "Grey_Mould": [
+        "Improve ventilation and reduce humidity around plants.",
+        "Remove and destroy infected leaves and plant debris promptly.",
+        "Avoid overhead watering and water early in the day so foliage dries quickly.",
+    ],
+    "Tip_Burn": [
+        "Tip burn is often a nutrient or water-balance problem rather than an infection; check for uneven watering.",
+        "Maintain steady soil moisture and avoid sudden swings in growth rate.",
+        "Consult a local extension office about calcium management for your soil and crop stage.",
+    ],
+    "Damaged_Leaf": [
+        "This looks like physical or pest damage rather than a confirmed disease.",
+        "Inspect leaf undersides and the surrounding plants for pests or mechanical injury.",
+        "If damage keeps spreading, consult a local agricultural extension office for diagnosis.",
+    ],
+    "Bacterial_Soft_Rot": [
+        "Remove and destroy affected plants away from the field; avoid injuring healthy plants.",
+        "Improve drainage and avoid waterlogged soil, which favors soft rot.",
+        "Handle and store harvested produce dry and cool, and consult a local extension office for management options.",
+    ],
+    "Yellow_Virus": [
+        "Remove and destroy infected plants early to reduce spread within the field.",
+        "Control insect vectors such as aphids and whiteflies using cultural measures, and scout regularly.",
+        "Consult a local agricultural extension office about resistant varieties and approved management in your region.",
+    ],
 }
 
 SEVERITY_TIPS = {

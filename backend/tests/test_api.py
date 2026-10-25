@@ -169,7 +169,7 @@ def test_history_returns_list():
     assert len(data) >= 1
     assert "predicted_disease" in data[0]
 
-@pytest.mark.parametrize("crop", ["pepper", "squash"])
+@pytest.mark.parametrize("crop", ["pepper", "squash", "broccoli", "cabbage", "cauliflower"])
 def test_predict_accepts_new_vegetable_crops(crop):
     image_bytes = _make_test_image_bytes()
     resp = client.post(
