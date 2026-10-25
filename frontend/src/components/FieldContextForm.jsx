@@ -2,7 +2,7 @@ import React from "react";
 import WeatherFetchButton from "./WeatherFetchButton";
 import { useLanguage } from "../i18n/LanguageContext";
 
-const CROP_VALUES = ["tomato", "potato", "corn"];
+  const CROP_VALUES = ["tomato", "potato", "corn", "pepper", "squash", "broccoli", "cabbage", "cauliflower"];
 const GROWTH_STAGE_VALUES = ["seedling", "vegetative", "flowering", "fruiting", "maturity"];
 
 /**

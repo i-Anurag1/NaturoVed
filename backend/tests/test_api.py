@@ -168,3 +168,36 @@ def test_history_returns_list():
     assert isinstance(data, list)
     assert len(data) >= 1
     assert "predicted_disease" in data[0]
+
+@pytest.mark.parametrize("crop", ["pepper", "squash", "broccoli", "cabbage", "cauliflower"])
+def test_predict_accepts_new_vegetable_crops(crop):
+    image_bytes = _make_test_image_bytes()
+    resp = client.post(
+        "/predict",
+        files={"image": ("leaf.jpg", image_bytes, "image/jpeg")},
+        data={
+            "crop_type": crop,
+            "growth_stage": "vegetative",
+            "temperature_c": "27",
+            "humidity_pct": "80",
+            "rainfall_mm": "12",
+            "soil_moisture_pct": "50",
+            "location": "Test Field",
+        },
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert "predicted_disease" in body
+    assert isinstance(body["recommendations"], list)
+
+
+def test_new_classes_are_consistent_across_labels_and_schema():
+    from app.ml.labels import CLASS_NAMES, CLASS_INFO, CLASS_TO_CROP
+    from app.models.schemas import CropType
+
+    allowed_crops = {c.value for c in CropType}
+    for name in CLASS_NAMES:
+        # every class has a description
+        assert name in CLASS_INFO
+        # every class's crop is accepted by the API
+        assert CLASS_TO_CROP[name] in allowed_crops
