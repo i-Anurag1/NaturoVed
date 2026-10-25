@@ -236,9 +236,16 @@ def predict_disease(image_path: str, crop_type: str) -> dict:
     if _model_mode == "trained":
         x = _preprocess_image(image_path)
         try:
-            probs = np.asarray(_model.predict(x, verbose=0)[0])
+            # Validate the actual runtime output before using class indices.
+            raw_probs = _model(x, training=False)
+            probs = np.asarray(raw_probs)[0]
+            expected = len(_label_map) if isinstance(_label_map, dict) else 0
+            if probs.ndim != 1 or expected == 0 or probs.size != expected:
+                raise ValueError(
+                    f"Runtime output has {probs.size} classes; label map has {expected}"
+                )
         except Exception as exc:
-            print(f"[image_model] Trained inference failed; switching to heuristic fallback: {exc}")
+            print(f"[image_model] Incompatible trained model; switching to heuristic fallback: {exc}")
             _model = None
             _label_map = None
             _model_mode = "fallback_heuristic"
