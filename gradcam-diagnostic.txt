@@ -1,0 +1,16 @@
+[OK] Backend folder - C:\Users\anura\Downloads\NaturoVed-main\backend
+[OK] Frontend folder - C:\Users\anura\Downloads\NaturoVed-main\frontend
+[NEEDS ATTENTION] Git repository - ZIP extraction is not a Git repository; clone or initialize later
+[NEEDS ATTENTION] Disease model - Expected trained Keras model
+[NEEDS ATTENTION] Model label map - Expected model label mapping
+[NEEDS ATTENTION] Raw dataset - C:\Users\anura\Downloads\NaturoVed-main\data\raw
+[OK] TensorFlow import - Import test
+[OK] Backend imports - FastAPI, Uvicorn, NumPy, Pillow, OpenCV
+[OK] Class labels parsed - 25 classes found in labels.py
+[NEEDS ATTENTION] Raw class coverage - 0/25 classes have images
+[NEEDS ATTENTION] Prepared train/val/test splits - All configured classes must have images in all three splits
+[NEEDS ATTENTION] Model training - No valid trained model and/or complete prepared dataset. Obtain and verify the dataset first.
+[OK] Grad-CAM service file - C:\Users\anura\Downloads\NaturoVed-main\backend\app\services\gradcam.py
+[OK] Frontend package.json - C:\Users\anura\Downloads\NaturoVed-main\frontend\package.json
+[OK] Node.js - Node command available
+[OK] npm - npm command available

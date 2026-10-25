@@ -1,0 +1,1 @@
+DEMO ONLY: This model was initialized with random weights and was NOT trained on real crop-disease images. Predictions and Grad-CAM heatmaps are not valid disease diagnoses. Replace this model with a properly trained and evaluated model before real-world use.
