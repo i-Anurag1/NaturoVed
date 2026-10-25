@@ -65,7 +65,30 @@ def _try_load_model():
                     _label_map = {int(k): v for k, v in json.load(f).items()}
             else:
                 _label_map = {i: c for i, c in enumerate(CLASS_NAMES)}
-            print(f"[image_model] Loaded trained model from {resolved_path}")
+
+            # Fail safely if the saved model and label map disagree.
+            # Never index a probability vector using labels the model cannot output.
+            output_shape = _model.output_shape
+            output_count = int(output_shape[-1]) if output_shape and output_shape[-1] is not None else 0
+            label_indices = set(_label_map.keys())
+            labels_compatible = (
+                output_count > 0
+                and len(_label_map) == output_count
+                and all(isinstance(i, int) and 0 <= i < output_count for i in label_indices)
+                and all(name in CLASS_TO_CROP for name in _label_map.values())
+            )
+
+            if not labels_compatible:
+                print(
+                    f"[image_model] Model/label mismatch: model outputs={output_count}, "
+                    f"label-map entries={len(_label_map)}. Using demo heuristic mode."
+                )
+                _model = None
+                _label_map = None
+                _model_mode = "fallback_heuristic"
+                return
+
+            print(f"[image_model] Loaded compatible model from {resolved_path}")
             return
         except Exception as e:
             print(f"[image_model] Failed to load trained model ({e}); using fallback heuristic mode.")
