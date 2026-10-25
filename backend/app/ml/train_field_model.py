@@ -51,7 +51,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score, f1_score
 import joblib
 
-CROPS = ["tomato", "potato", "corn"]
+CROPS = ["tomato", "potato", "corn", "pepper", "squash"]
 GROWTH_STAGES = ["seedling", "vegetative", "flowering", "fruiting", "maturity"]
 RISK_LABELS = ["Low", "Medium", "High"]
 

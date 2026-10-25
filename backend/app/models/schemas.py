@@ -20,6 +20,8 @@ class CropType(str, Enum):
     tomato = "tomato"
     potato = "potato"
     corn = "corn"  # maize
+    pepper = "pepper"
+    squash = "squash"
 
 
 class FieldContextIn(BaseModel):
