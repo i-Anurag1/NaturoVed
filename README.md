@@ -5,6 +5,7 @@
 ### AI-powered leaf disease detection fused with real-time field & weather context
 
 *A full-stack, end-to-end academic project — B.Tech CSE, 4-member team*
+
 Aditi Dubey, Vartika Raj, Anurag Thakur, Vipul Taori
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
