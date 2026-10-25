@@ -1,0 +1,11 @@
+﻿NATUROVED DEMO MODE
+
+The current disease model may have random weights and has not been validated
+on a correctly labeled, held-out crop-disease dataset.
+
+Predictions, confidence scores, recommendations and Grad-CAM heatmaps must
+not be treated as reliable crop-disease diagnoses until training and evaluation
+on representative labeled images are complete.
+
+A Grad-CAM image only demonstrates the visualization pipeline. It does not
+prove that the model learned meaningful disease features.
