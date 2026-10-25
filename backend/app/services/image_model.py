@@ -230,6 +230,7 @@ def predict_disease(image_path: str, crop_type: str) -> dict:
     Main entry point used by the /predict route.
     Returns: {predicted_disease, confidence, model_mode}
     """
+    global _model, _label_map, _model_mode
     _try_load_model()
 
     if _model_mode == "trained":
