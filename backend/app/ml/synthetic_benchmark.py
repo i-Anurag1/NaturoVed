@@ -50,6 +50,21 @@ _CLASS_COLORS = {
     "Corn___Healthy": (50, 145, 50),
     "Corn___Common_Rust": (180, 90, 60),
     "Corn___Gray_Leaf_Spot": (130, 120, 110),
+    "Pepper___Healthy": (34, 139, 34),
+    "Pepper___Bacterial_Spot": (101, 67, 33),
+    "Squash___Powdery_Mildew": (230, 230, 220),
+    "Broccoli___Healthy": (34, 139, 34),
+    "Broccoli___Alternaria_Leaf_Spot": (120, 85, 40),
+    "Broccoli___Black_Rot": (60, 50, 30),
+    "Cabbage___Healthy": (34, 139, 34),
+    "Cabbage___Alternaria_Leaf_Spot": (130, 95, 50),
+    "Cabbage___Grey_Mould": (150, 150, 150),
+    "Cabbage___Tip_Burn": (190, 150, 80),
+    "Cabbage___Damaged_Leaf": (110, 70, 70),
+    "Cauliflower___Healthy": (34, 139, 34),
+    "Cauliflower___Alternaria_Leaf_Spot": (125, 90, 45),
+    "Cauliflower___Bacterial_Soft_Rot": (160, 140, 90),
+    "Cauliflower___Yellow_Virus": (210, 200, 60),
 }
 
 
