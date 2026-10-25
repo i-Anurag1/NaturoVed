@@ -235,7 +235,16 @@ def predict_disease(image_path: str, crop_type: str) -> dict:
 
     if _model_mode == "trained":
         x = _preprocess_image(image_path)
-        probs = np.asarray(_model.predict(x, verbose=0)[0])
+        try:
+            probs = np.asarray(_model.predict(x, verbose=0)[0])
+        except Exception as exc:
+            print(f"[image_model] Trained inference failed; switching to heuristic fallback: {exc}")
+            _model = None
+            _label_map = None
+            _model_mode = "fallback_heuristic"
+            result = _fallback_heuristic_predict(image_path, crop_type)
+            result["model_mode"] = "fallback_heuristic"
+            return result
 
         # Validate runtime probabilities before indexing class labels.
         # Incompatible demo artifacts safely fall back to heuristic mode.
