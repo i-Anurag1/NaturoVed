@@ -20,12 +20,19 @@ Two-phase training strategy:
   Phase 2: unfreeze the top N layers of the base and fine-tune with a
            much lower learning rate (squeezes out extra accuracy).
 
+Class imbalance: the expanded dataset has classes ranging from ~40 to
+~1,300 training images, so both phases use square-root-dampened class
+weights (see compute_class_weights below).
+
 Usage:
     python -m app.ml.train_transfer --data_dir ../../data/processed --epochs 10 --fine_tune_epochs 5
 """
 import argparse
 import json
 import os
+from pathlib import Path
+
+import numpy as np
 import tensorflow as tf
 from tensorflow.keras import layers, models
 from app.ml.labels import CLASS_NAMES, IMG_SIZE, NUM_CLASSES
@@ -63,6 +70,21 @@ def build_transfer_model(num_classes=NUM_CLASSES, img_size=IMG_SIZE, weights="im
     return model, base_model
 
 
+def compute_class_weights(train_dir):
+    """
+    Per-class loss weights so rare classes (e.g. ~40 images) are not
+    drowned out by large ones (~1,300 images). Weight = sqrt(mean/count):
+    a gentler version of the usual inverse-frequency weighting, which
+    would over-weight the smallest classes and destabilise training.
+    Returns (class_weight dict keyed by class index, counts list).
+    """
+    train_dir = Path(train_dir)
+    counts = [len(list((train_dir / name).glob("*"))) for name in CLASS_NAMES]
+    mean_count = float(np.mean(counts))
+    class_weight = {i: float((mean_count / max(n, 1)) ** 0.5) for i, n in enumerate(counts)}
+    return class_weight, counts
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_dir", default="../../data/processed")
@@ -73,11 +95,20 @@ def main():
     parser.add_argument("--out", default="../../backend/storage/models/disease_model.keras")
     parser.add_argument("--weights", default="imagenet", choices=["imagenet", "none"],
                          help="Use 'none' only for offline/CI smoke tests — see build_transfer_model docstring.")
+    parser.add_argument("--no_class_weights", action="store_true",
+                         help="Disable class weighting (default: enabled).")
     args = parser.parse_args()
 
     weights = None if args.weights == "none" else "imagenet"
 
     train_ds, val_ds, test_ds = load_datasets(args.data_dir, batch_size=args.batch_size)
+
+    if args.no_class_weights:
+        class_weight = None
+    else:
+        class_weight, counts = compute_class_weights(os.path.join(args.data_dir, "train"))
+        print("Train images per class:", dict(zip(CLASS_NAMES, counts)))
+        print("Class weights:", {CLASS_NAMES[i]: round(w, 2) for i, w in class_weight.items()})
 
     augment = get_augmentation_layer()
     train_ds_aug = train_ds.map(lambda x, y: (augment(x, training=True), y))
@@ -101,7 +132,8 @@ def main():
     ]
 
     print("\n=== Phase 1: training classification head (frozen base) ===")
-    history1 = model.fit(train_ds_aug, validation_data=val_ds, epochs=args.epochs, callbacks=callbacks)
+    history1 = model.fit(train_ds_aug, validation_data=val_ds, epochs=args.epochs,
+                         callbacks=callbacks, class_weight=class_weight)
 
     print("\n=== Phase 2: fine-tuning top layers of MobileNetV2 ===")
     base_model.trainable = True
@@ -118,6 +150,7 @@ def main():
         validation_data=val_ds,
         epochs=args.fine_tune_epochs,
         callbacks=callbacks,
+        class_weight=class_weight,
     )
 
     test_loss, test_acc = model.evaluate(test_ds)
