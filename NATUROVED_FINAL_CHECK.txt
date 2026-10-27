@@ -1,0 +1,6 @@
+﻿PASS - Demo warning written
+BLOCKED - Dataset: 0/25 classes have images
+PASS - Backend pytest suite (exit 0)
+CHECK - Python and TensorFlow import (exit 1)
+PASS - Frontend production build (exit 0)
+BLOCKED - No .git directory; GitHub push not attempted

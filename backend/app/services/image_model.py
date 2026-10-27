@@ -65,7 +65,30 @@ def _try_load_model():
                     _label_map = {int(k): v for k, v in json.load(f).items()}
             else:
                 _label_map = {i: c for i, c in enumerate(CLASS_NAMES)}
-            print(f"[image_model] Loaded trained model from {resolved_path}")
+
+            # Fail safely if the saved model and label map disagree.
+            # Never index a probability vector using labels the model cannot output.
+            output_shape = _model.output_shape
+            output_count = int(output_shape[-1]) if output_shape and output_shape[-1] is not None else 0
+            label_indices = set(_label_map.keys())
+            labels_compatible = (
+                output_count > 0
+                and len(_label_map) == output_count
+                and all(isinstance(i, int) and 0 <= i < output_count for i in label_indices)
+                and all(name in CLASS_TO_CROP for name in _label_map.values())
+            )
+
+            if not labels_compatible:
+                print(
+                    f"[image_model] Model/label mismatch: model outputs={output_count}, "
+                    f"label-map entries={len(_label_map)}. Using demo heuristic mode."
+                )
+                _model = None
+                _label_map = None
+                _model_mode = "fallback_heuristic"
+                return
+
+            print(f"[image_model] Loaded compatible model from {resolved_path}")
             return
         except Exception as e:
             print(f"[image_model] Failed to load trained model ({e}); using fallback heuristic mode.")
@@ -207,30 +230,74 @@ def predict_disease(image_path: str, crop_type: str) -> dict:
     Main entry point used by the /predict route.
     Returns: {predicted_disease, confidence, model_mode}
     """
+    global _model, _label_map, _model_mode
+    # These newer crop classes may not match the deployed model artifact.
+    # Use the existing safe demo fallback rather than indexing incompatible outputs.
+    if crop_type in {"pepper", "squash", "broccoli", "cabbage", "cauliflower"}:
+        result = _fallback_heuristic_predict(image_path, crop_type)
+        result["model_mode"] = "fallback_heuristic"
+        return result
+
     _try_load_model()
 
     if _model_mode == "trained":
         x = _preprocess_image(image_path)
-        probs = _model.predict(x, verbose=0)[0]
+        try:
+            # Validate the actual runtime output before using class indices.
+            raw_probs = _model(x, training=False)
+            probs = np.asarray(raw_probs)[0]
+            expected = len(_label_map) if isinstance(_label_map, dict) else 0
+            if probs.ndim != 1 or expected == 0 or probs.size != expected:
+                raise ValueError(
+                    f"Runtime output has {probs.size} classes; label map has {expected}"
+                )
+        except Exception as exc:
+            print(f"[image_model] Incompatible trained model; switching to heuristic fallback: {exc}")
+            _model = None
+            _label_map = None
+            _model_mode = "fallback_heuristic"
+            result = _fallback_heuristic_predict(image_path, crop_type)
+            result["model_mode"] = "fallback_heuristic"
+            return result
 
-        # Restrict to classes belonging to the user-declared crop_type so
-        # the field-context input actively participates in the pipeline
-        # (true multimodal behavior, not "image model ignores context").
-        valid_indices = [i for i, name in _label_map.items() if CLASS_TO_CROP[name] == crop_type]
-        if valid_indices:
-            masked_probs = np.zeros_like(probs)
-            for i in valid_indices:
-                masked_probs[i] = probs[i]
-            if masked_probs.sum() > 0:
-                masked_probs = masked_probs / masked_probs.sum()
-                probs = masked_probs
+        # Validate runtime probabilities before indexing class labels.
+        # Incompatible demo artifacts safely fall back to heuristic mode.
+        usable = (
+            isinstance(_label_map, dict)
+            and probs.ndim == 1
+            and probs.size == len(_label_map)
+            and all(isinstance(i, int) and 0 <= i < probs.size for i in _label_map)
+            and all(name in CLASS_TO_CROP for name in _label_map.values())
+        )
 
-        top_idx = int(np.argmax(probs))
-        return {
-            "predicted_disease": _label_map[top_idx],
-            "confidence": float(round(probs[top_idx], 4)),
-            "model_mode": "trained",
-        }
+        if not usable:
+            print(
+                f"[image_model] Runtime model/label mismatch: "
+                f"probabilities={probs.size}, labels={len(_label_map or {})}. "
+                "Switching to demo heuristic mode."
+            )
+            _model = None
+            _label_map = None
+            _model_mode = "fallback_heuristic"
+        else:
+            valid_indices = [
+                i for i, name in _label_map.items()
+                if CLASS_TO_CROP[name] == crop_type
+            ]
+            if valid_indices:
+                masked_probs = np.zeros_like(probs)
+                for i in valid_indices:
+                    masked_probs[i] = probs[i]
+                if masked_probs.sum() > 0:
+                    masked_probs = masked_probs / masked_probs.sum()
+                    probs = masked_probs
+
+            top_idx = int(np.argmax(probs))
+            return {
+                "predicted_disease": _label_map[top_idx],
+                "confidence": float(round(probs[top_idx], 4)),
+                "model_mode": "trained",
+            }
 
     result = _fallback_heuristic_predict(image_path, crop_type)
     result["model_mode"] = "fallback_heuristic"

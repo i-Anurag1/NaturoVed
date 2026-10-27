@@ -160,6 +160,7 @@ async def predict(
         fusion_rationale = None
 
         feature_fusion_result = None
+        image_prediction_mode = None
         if fusion_method == "feature_fusion":
             feature_fusion_result = feature_fusion.predict_with_feature_fusion(
                 image_path=save_path, crop_type=crop_type.value, growth_stage=growth_stage.value,
@@ -184,6 +185,7 @@ async def predict(
                 fallback_note = ""
 
             img_result = image_model.predict_disease(save_path, crop_type.value)
+            image_prediction_mode = img_result.get("model_mode")
             predicted_disease = img_result["predicted_disease"]
             image_confidence = img_result["confidence"]
 
@@ -216,9 +218,14 @@ async def predict(
             field_risk_level=field_result["risk_level"],
         )
 
-        # 7. Grad-CAM (only meaningful for a trained image model; None otherwise)
+        # Grad-CAM is valid only when the trained image model produced the prediction.
+        # Never pass heuristic fallback predictions into the trained model class-index path.
         gradcam_available = False
-        if image_model.is_model_loaded():
+        if (
+            actual_fusion_method == "late_fusion"
+            and image_prediction_mode == "trained"
+            and image_model.is_model_loaded()
+        ):
             gradcam_check = image_model.generate_gradcam_for_disease(save_path, predicted_disease)
             gradcam_available = gradcam_check is not None
 

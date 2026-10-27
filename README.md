@@ -6,6 +6,8 @@
 
 *A full-stack, end-to-end academic project — B.Tech CSE, 4-member team*
 
+Aditi Dubey, Vartika Raj, Anurag Thakur, Vipul Taori
+
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-Frontend-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
